@@ -94,7 +94,7 @@ for sigma in sigma_scale:
         g_losses.append(g_loss.item())
         d_losses.append(d_loss.item())
 
-        utils.logger.save_images(epoch, fake_data, sigma)
+        # utils.logger.save_images(epoch, fake_data, sigma)
         if epoch % utils.logger.data_save_interval == 0: 
             utils.logger.losses_over_epoches(g_losses, d_losses, epoch, sigma)
 

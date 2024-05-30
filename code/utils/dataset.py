@@ -10,12 +10,6 @@ from utils.logger import check_and_mkdir_if_necessary, ROOT_DIR, today
 from sklearn.preprocessing import StandardScaler, MinMaxScaler, LabelEncoder
 
 
-img_transform = transforms.Compose([
-    transforms.ToTensor(),
-    transforms.Normalize((0.5, ), (0.5, ))
-])
-
-
 
 class AdultDataset(Dataset):
     def __init__(self):
@@ -55,8 +49,6 @@ class AdultDataset(Dataset):
             self.data[field] = label_encoder.fit_transform(self.data[field])
 
     def __preprocess_data(self):
-        self.data = pd.read_csv(os.path.join(config.get('datasets_dir'), 'adult', 'adult.csv'))
-        
         #1 Mapping 'income' column values
         self.data['income'] = self.data['income'].map({'<=50K': 1, '>50K': 0}).astype(int)
 
@@ -122,61 +114,26 @@ class AdultDataset(Dataset):
         self.data.drop(['fnlwgt'], axis=1, inplace=True)
         
     def __save_clean(self):
-        working_path = os.path.join(config.get('working_dir'), self.name, self.name+'_cleaned.csv')
-        self.data.to_csv(working_path, index=False)
-
-
-# class MyDataset(Dataset):
-#     def __init__(self):
-#         super(MyDataset, self).__init__()
-#         self.name = 'mydataset'
-#         self.transform = img_transform
-        
-
-#         # Create required directories    
-#         working_path = os.path.join(config.get('working_dir'), self.name)
-#         if not os.path.exists(working_path): os.makedirs(working_path,  exist_ok=True)
-        
-#         models_path = os.path.join(config.get('models_dir'), self.name)
-#         if not os.path.exists(models_path): os.makedirs(models_path, exist_ok=True)
-
-#         # Load Data
-#         path = os.path.join(config.get('datasets_dir'), self.name, 'mydataset.csv')
-        
-#         self.data = pd.read_csv(path)
-#         self.__preprocess_data()       
-#         self.__normalize_data()
-    
-#     def __len__(self):
-#         return len(self.data)
-
-#     def __getitem__(self, idx):
-#         sample = self.data.iloc[idx]
-#         sample = torch.tensor(sample.values, dtype=torch.float32)
-#         return sample
-
-#     def __normalize_data(self):
-#         scaler = MinMaxScaler()
-#         self.data[['age', 'weight', 'height']] = scaler.fit_transform(self.data[['age', 'weight', 'height']])
-
-#     def __preprocess_data(self):
-#         # self.data.drop(columns=['age'])
-#         pass
-
-
+        output_path = os.path.join(ROOT_DIR, 'data', 'output', 'clean_datasets', self.name)
+        check_and_mkdir_if_necessary(output_path)
+        self.data.to_csv(f'{output_path}/{self.name}.csv', index=False)
 
 class CustomMNIST(Dataset):
     def __init__(self):
         super(CustomMNIST, self).__init__()
         self.name = 'mnist'
-        self.transform = img_transform
+        self.transform = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.5, ), (0.5, ))
+        ])
+
         
 
         # Create required directories 
         input_path = os.path.join(ROOT_DIR, 'data', 'input', self.name)
         check_and_mkdir_if_necessary(input_path)
 
-        self.data = datasets.MNIST(root=input_path, download=True, train=True, transform=img_transform)
+        self.data = datasets.MNIST(root=input_path, download=True, train=True, transform=self.transform)
         
         self.__preprocess_data()       
         self.__normalize_data()
