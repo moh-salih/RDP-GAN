@@ -25,7 +25,11 @@ class RdpGan():
         # Optimizers
         self.g_optimizer = torch.optim.Adam(self.generator.parameters(), lr=self.g_lr) 
         self.d_optimizer = torch.optim.Adam(self.discriminator.parameters(), lr=self.d_lr)
-       
+
+    def train(self):
+        self.generator.train()
+        self.discriminator.train()
+        
     def train_generator(self, batch_size):
         real_label = torch.ones((batch_size, 1))
         noise = torch.randn(batch_size, self.latent_dim)

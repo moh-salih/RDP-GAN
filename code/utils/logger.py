@@ -50,8 +50,8 @@ def save_model(epoch, generator, sigma=0, name=''):
     model_path =  os.path.join(ROOT_DIR, 'data', 'working', today, dataset_name, 'models', privacy_mode)
     check_and_mkdir_if_necessary(model_path)
 
-    model_name = f'epoch_{epoch}_sigma_{sigma}.png'
-    torch.save(generator.state_dict(), f'{model_path}{model_name}')
+    model_name = f'epoch_{epoch}_sigma_{sigma}.pth'
+    torch.save(generator.state_dict(), f'{model_path}/{model_name}')
 
 
 def save_csv(epoch, data, sigma=0, file_name=''):
@@ -91,7 +91,7 @@ def losses_over_epoches(g_losses, d_losses,  epoch, sigma=0, x_label='Epoch', y_
     if privacy_mode == 'no_privacy':
         title='Generator and Discriminator Losses'
     else:
-        title='Generator and Discriminator Losses with sigma = {sigma}'
+        title=f'Generator and Discriminator Losses with sigma = {sigma}'
     
     plt.title(title)
     

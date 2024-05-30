@@ -37,8 +37,7 @@ if args.dataset == 'mnist':
 elif args.dataset == 'adult':
     dataset = AdultDataset()
 
-# dataset = MyDataset()
-# dataset = CustomMNIST()
+
 
 #1 Set required hyperparameters
 input_dim  = output_dim = dataset.num_features
@@ -46,41 +45,43 @@ latent_dim = args.latent_dim
 batch_size = args.batch_size
 epochs = args.epochs
 shuffleDataset = True
+privacy_mode=args.privacy_mode
 
-#2 Load, Preprocess, and Create required directories
+
+#2 Prepocessing
 dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=shuffleDataset)
 
 
-#3 Set required parameters to use `utils` properly
+#3 The following parameters should not be changed
 utils.logger.data_save_interval = args.save_interval
 utils.logger.model_save_interval = args.save_interval
 utils.logger.show_log_interval = 1
-utils.logger.privacy_mode = args.privacy_mode
-# The following parameters shouldn't be changed
+utils.logger.privacy_mode = privacy_mode
 utils.logger.num_epochs = epochs
 utils.logger.dataset_name = dataset.name
 
 
 #4 Build RDP-GAN  
-sigma_scale = [0, 0.1, 0.01, 0.001]
+sigma_scale = [0.1, 0.01, 0.001]
 for sigma in sigma_scale:
     rdpGan = RdpGan(input_dim=input_dim, output_dim=output_dim, latent_dim=latent_dim)
     g_losses, d_losses = [], []
 
     #5 Train RDP-GAN
     for epoch in range(epochs):
+        rdpGan.train() # Activate training mode 
 
         for batch_idx, batch_data in enumerate(dataloader):
             current_batch_size = len(batch_data)
             
             # Train discriminator
-            if args.privacy_mode == 'no_privacy':
+            if privacy_mode == 'no_privacy':
                 d_loss, real_scores, fake_scores = rdpGan.train_d_with_no_privacy(batch_data)
             
-            elif args.privacy_mode == 'add_to_loss':
+            elif privacy_mode == 'add_to_loss':
                 d_loss, real_scores, fake_scores = rdpGan.train_d_with_noise_to_loss_privacy(batch_data,sigma=sigma)
 
-            elif args.privacy_mode == 'add_to_weights':
+            elif privacy_mode == 'add_to_weights':
                 d_loss, real_scores, fake_scores = rdpGan.train_d_with_noise_to_weights_privacy(batch_data,sigma=sigma, C=args.p_bound)
 
             # Train generator
@@ -96,3 +97,6 @@ for sigma in sigma_scale:
         utils.logger.save_images(epoch, fake_data, sigma)
         if epoch % utils.logger.data_save_interval == 0: 
             utils.logger.losses_over_epoches(g_losses, d_losses, epoch, sigma)
+
+    if privacy_mode == 'no_privacy':
+        break # No need repeat training
