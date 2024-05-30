@@ -1,0 +1,4 @@
+data/input/mnist/
+data/working/
+data/output/
+*.pyc
