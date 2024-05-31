@@ -48,32 +48,25 @@ sigma_scale = [0.1, 0.01, 0.001]
 for sigma in sigma_scale:
     rdpGan = RdpGan(input_dim=num_features, output_dim=num_features, latent_dim=args.latent_dim)
     g_losses, d_losses = [], []
-
     #5 Train RDP-GAN
     for epoch in range(args.epochs):
         rdpGan.train() # Activate training mode 
-
         for batch_idx, batch_data in enumerate(dataloader):
             current_batch_size = len(batch_data)
-            
             # Train discriminator
             if args.privacy_mode == 'without_privacy':
-                d_loss, real_scores, fake_scores = rdpGan.train_d_without_privacy(batch_data)
-            
+                d_loss, real_scores, fake_scores = rdpGan.train_d_without_privacy(batch_data)        
             elif args.privacy_mode == 'with_privacy':
                 d_loss, real_scores, fake_scores = rdpGan.train_d_with_privacy(batch_data,sigma=sigma, C=args.p_bound)
-
             # Train generator
             g_loss, fake_data = rdpGan.train_generator(batch_size=current_batch_size)
 
+        # Loggin    
         utils.logger.save_model(epoch, rdpGan.generator)
-        utils.logger.save_csv(epoch, data=fake_data.detach().numpy())
-        utils.logger.log(epoch, d_loss, g_loss, real_scores, fake_scores)
-        
+        utils.logger.log(epoch, d_loss, g_loss, real_scores, fake_scores)        
         g_losses.append(g_loss.item())
         d_losses.append(d_loss.item())
-
-        # utils.logger.save_images(epoch, fake_data, sigma)
+        if args.dataset == 'mnist': utils.logger.save_images(epoch, fake_data, sigma)
+        utils.logger.save_csv(epoch, data=fake_data.detach().numpy())
         utils.logger.losses_over_epoches(g_losses, d_losses, epoch, sigma)
-
     if args.privacy_mode == 'no_privacy': break # No need repeat training

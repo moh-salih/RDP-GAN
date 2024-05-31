@@ -2,3 +2,5 @@ data/input/mnist/
 data/working/
 data/output/
 *.pyc
+
+code/play_training.py

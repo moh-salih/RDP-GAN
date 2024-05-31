@@ -108,7 +108,7 @@ def losses_over_epoches(g_losses, d_losses,  epoch, sigma=0, x_label='Epoch', y_
     plt.xlabel(x_label)
     plt.ylabel(y_label)
 
-    if privacy_mode == 'with_privacy':
+    if privacy_mode == 'without_privacy':
         title='Generator and Discriminator Losses'
     else:
         title=f'Generator and Discriminator Losses with sigma = {sigma}'
