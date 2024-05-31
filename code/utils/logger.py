@@ -64,6 +64,16 @@ def save_csv(epoch, data, sigma=0, file_name=''):
 
     fake_data_df.to_csv(f'{data_path}/{file_name}', index=False, header=False)
 
+def save_output_csv(data, index=0):
+    # if epoch % data_save_interval != 0: return
+    fake_data_df = pd.DataFrame(data)
+
+    data_path =  os.path.join(ROOT_DIR, 'data', 'output', today, dataset_name, privacy_mode)
+    check_and_mkdir_if_necessary(data_path)
+    file_name = f'fake_tablular_data_{index}.csv'
+
+    fake_data_df.to_csv(f'{data_path}/{file_name}', index=False, header=False)
+
 
 def save_images(epoch, image, sigma=0):
     if epoch % data_save_interval != 0: return
@@ -76,6 +86,15 @@ def save_images(epoch, image, sigma=0):
     
     save_image(image, f'{image_path}/{image_name}')
 
+def save_output_images(image, index=0):
+    # if epoch % data_save_interval != 0: return
+
+    image = to_img(image.data)
+    image_path =  os.path.join(ROOT_DIR, 'data', 'output', today, dataset_name, privacy_mode)
+    check_and_mkdir_if_necessary(image_path)
+    image_name = f'fake_image_{index}.png' 
+    
+    save_image(image, f'{image_path}/{image_name}')
 
 def losses_over_epoches(g_losses, d_losses,  epoch, sigma=0, x_label='Epoch', y_label='Loss', ):
     if epoch % data_save_interval != 0: return
