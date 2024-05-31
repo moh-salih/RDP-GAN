@@ -40,7 +40,7 @@ def log(epoch, d_loss, g_loss, real_scores, fake_scores):
     if epoch % show_log_interval != 0: return 
     print('Epoch [{}/{}], d_loss: {:.6f}, g_loss: {:.6f} '
             'D real: {:.6f}, D fake: {:.6f}'.format(
-                epoch, num_epochs, d_loss.item(), g_loss.item(),
+                epoch + 1, num_epochs, d_loss.item(), g_loss.item(),
                 real_scores.data.mean(), fake_scores.data.mean()))
 
 
@@ -50,7 +50,7 @@ def save_model(epoch, generator, sigma=0, name=''):
     model_path =  os.path.join(ROOT_DIR, 'data', 'working', today, dataset_name, 'models', privacy_mode)
     check_and_mkdir_if_necessary(model_path)
 
-    model_name = f'epoch_{epoch}_sigma_{sigma}.pth'
+    model_name = f'epoch_{epoch + 1}_sigma_{sigma}.pth'
     torch.save(generator.state_dict(), f'{model_path}/{model_name}')
 
 
@@ -60,24 +60,25 @@ def save_csv(epoch, data, sigma=0, file_name=''):
 
     data_path =  os.path.join(ROOT_DIR, 'data', 'working', today, dataset_name, 'data', privacy_mode)
     check_and_mkdir_if_necessary(data_path)
-    file_name = f'epoch_{epoch}_sigma_{sigma}_{file_name}.csv'
+    file_name = f'epoch_{epoch + 1}_sigma_{sigma}_{file_name}.csv'
 
     fake_data_df.to_csv(f'{data_path}/{file_name}', index=False, header=False)
 
 
-def save_images(epoch, image, sigma):
+def save_images(epoch, image, sigma=0):
     if epoch % data_save_interval != 0: return
 
     image = to_img(image.data)
 
     image_path =  os.path.join(ROOT_DIR, 'data', 'working', today, dataset_name, 'images', privacy_mode)
     check_and_mkdir_if_necessary(image_path)
-    image_name = f'epoch_{epoch}_sigma_{sigma}.png' 
+    image_name = f'epoch_{epoch + 1}_sigma_{sigma}.png' 
     
     save_image(image, f'{image_path}/{image_name}')
 
 
 def losses_over_epoches(g_losses, d_losses,  epoch, sigma=0, x_label='Epoch', y_label='Loss', ):
+    if epoch % data_save_interval != 0: return
     plt.clf()
 
     plt.plot(range(1, len(g_losses) + 1), g_losses, label='Generator Loss', color='blue')
@@ -88,7 +89,7 @@ def losses_over_epoches(g_losses, d_losses,  epoch, sigma=0, x_label='Epoch', y_
     plt.xlabel(x_label)
     plt.ylabel(y_label)
 
-    if privacy_mode == 'no_privacy':
+    if privacy_mode == 'with_privacy':
         title='Generator and Discriminator Losses'
     else:
         title=f'Generator and Discriminator Losses with sigma = {sigma}'
@@ -106,5 +107,5 @@ def losses_over_epoches(g_losses, d_losses,  epoch, sigma=0, x_label='Epoch', y_
 
     path =  os.path.join(ROOT_DIR, 'data', 'working', today, dataset_name, 'visualization', privacy_mode)
     check_and_mkdir_if_necessary(path)
-    image_name = f'epoch_{epoch}_sigma_{sigma}.png'
+    image_name = f'epoch_{epoch + 1}_sigma_{sigma}.png'
     plt.savefig(f'{path}/{image_name}')

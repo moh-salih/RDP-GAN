@@ -1,13 +1,11 @@
 # RDP-GAN 
 
+** train with privacy **  
+`py train.py --epochs=100 --batch_size=128 --dataset=mnist --privacy_mode=without_privacy`  
+
 ** train without privacy **  
-`py train.py --epochs=300 --batch_size=64 --dataset=mnist save_interval=1 --privacy_mode=no_privacy`  
+`py train.py --epochs=100 --batch_size=128 --dataset=mnist --privacy_mode=without_privacy`  
 
-** train without add to loss technique privacy **  
-`py train.py --epochs=300 --batch_size=64 --dataset=mnist save_interval=1 --privacy_mode=add_to_loss`  
-
-** train without add to weights technique privacy **  
-`py train.py --epochs=300 --batch_size=64 --dataset=mnist save_interval=1 --privacy_mode=add_to_loss`  
 
 
 

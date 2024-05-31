@@ -8,14 +8,15 @@ class Generator(nn.Module):
         self.latent_dim = latent_dim
         self.output_dim = output_dim
 
+
         self.model = nn.Sequential(
-            nn.Linear(latent_dim, 128),
+            nn.Linear(latent_dim, 256),
             nn.ReLU(inplace=True),
-            nn.Linear(128, 256),
+
+            nn.Linear(256, 256),
             nn.ReLU(inplace=True),
-            nn.Linear(256, 512),
-            nn.ReLU(inplace=True),
-            nn.Linear(512, output_dim),
+
+            nn.Linear(256, output_dim),
             nn.Tanh() 
         )
         

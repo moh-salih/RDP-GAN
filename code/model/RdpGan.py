@@ -46,7 +46,7 @@ class RdpGan():
 
         return g_loss, fake_data
 
-    def train_d_with_no_privacy(self, real_data):
+    def train_d_without_privacy(self, real_data):
         batch_size = len(real_data)
         
         real_label = torch.ones((batch_size, 1))
@@ -74,7 +74,7 @@ class RdpGan():
 
         return d_loss, real_scores, fake_scores
 
-    def train_d_with_noise_to_loss_privacy(self, real_data, sigma):
+    def train_d_with_privacy(self, real_data, sigma, C):
         batch_size = len(real_data)
         
         real_label = torch.ones((batch_size, 1))
@@ -91,36 +91,7 @@ class RdpGan():
         fake_scores = fake_out
         
         # Compute loss
-        d_real_loss = self.criterion(real_out, real_label)
-        d_fake_loss = self.criterion(fake_out, fake_label)
-        d_loss = d_real_loss + d_fake_loss
-        d_loss += np.random.normal(0, sigma)
-
-        # Optimize and backpropogate
-        self.d_optimizer.zero_grad()
-        d_loss.backward()
-        self.d_optimizer.step()
-
-        return d_loss, real_scores, fake_scores
-
-    def train_d_with_noise_to_weights_privacy(self, real_data, sigma, C=6):
-        batch_size = len(real_data)
-        
-        real_label = torch.ones((batch_size, 1))
-        fake_label = torch.zeros((batch_size, 1))
-
-        # For Real Data
-        real_out = self.discriminator(real_data)
-        real_scores = real_out
-
-        # For Fake Data
-        noise = torch.randn(batch_size, self.latent_dim)
-        fake_data = self.generator(noise)
-        fake_out = self.discriminator(fake_data)
-        fake_scores = fake_out
-        
-        # Compute loss
-        d_real_loss = self.criterion(real_out, real_label)
+        d_real_loss = self.criterion(real_out, real_label) + np.random.normal(0, sigma) # RDP-GAN Algorithm 1: Add noise to the value of the loss
         d_fake_loss = self.criterion(fake_out, fake_label)
         d_loss = d_real_loss + d_fake_loss
 
@@ -128,7 +99,7 @@ class RdpGan():
         self.d_optimizer.zero_grad()
         d_loss.backward()
         
-        # Add noise to parameters
+        # RDP-GAN Algorithm 2 : adaptive noise tuning algorithm
         d_parameters = self.discriminator.state_dict()
         s_noise = copy.deepcopy(d_parameters)
         bound = []
