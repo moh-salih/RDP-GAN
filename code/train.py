@@ -69,4 +69,4 @@ for sigma in sigma_scale:
         if args.dataset == 'mnist': utils.logger.save_images(epoch, fake_data, sigma)
         utils.logger.save_csv(epoch, data=fake_data.detach().numpy())
         utils.logger.losses_over_epoches(g_losses, d_losses, epoch, sigma)
-    if args.privacy_mode == 'no_privacy': break # No need repeat training
+    if args.privacy_mode == 'without_privacy': break # No need repeat training

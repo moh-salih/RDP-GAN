@@ -73,7 +73,7 @@ class RdpGan():
         self.d_optimizer.step()
 
         return d_loss, real_scores, fake_scores
-
+    
     def train_d_with_privacy(self, real_data, sigma, C):
         batch_size = len(real_data)
         
