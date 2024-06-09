@@ -1,3 +1,6 @@
+## Disclaimer
+This is an unofficial implementation inspired by the Renyi Differential Private GAN paper. I am not an author of the paper, and while efforts have been made to align with the paper's concepts, please note that the accuracy of this implementation is not guaranteed.
+
 # RDP-GAN 
 
 ### Train with privacy  
